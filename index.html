@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRKM EDIT v3.2 | Magic Update</title>
+    <title>TRKM EDIT v3.2 | Magic & Paste Stable</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,7 +15,6 @@
         .active-tool { @apply bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]; }
         .hd-btn { @apply bg-gradient-to-br from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-black rounded-lg transition-all active:scale-95; }
         
-        /* Context Menu & Magic Panel */
         #context-menu, #magic-editor-panel { 
             position: absolute; display: none; background: #151515; border: 1px solid #333; 
             border-radius: 8px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.8); padding: 5px;
@@ -25,7 +24,6 @@
         #context-menu button { width: 100%; text-align: left; padding: 8px 12px; font-size: 11px; color: #ccc; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
         #context-menu button:hover { background: #3b82f6; color: white; }
         input[type="range"] { accent-color: #3b82f6; height: 4px; background: #333; appearance: none; border-radius: 2px; }
-        
         .magic-glow { box-shadow: 0 0 15px rgba(139, 61, 255, 0.3); border: 1px solid #8b3dff !important; }
     </style>
 </head>
@@ -74,7 +72,7 @@
             <canvas id="mainCanvas"></canvas>
             <div class="absolute bottom-4 left-4 bg-[#0a0a0a]/90 p-3 rounded-lg border border-[#222] text-[9px] text-gray-400">
                 <p><span class="text-white font-mono">1:</span> Menü | <span class="text-white font-mono">V:</span> Seçim | <span class="text-white font-mono">R:</span> Kare</p>
-                <p><span class="text-purple-400 font-mono">Magic:</span> Dışarı tıklayınca kapanır</p>
+                <p><span class="text-green-500 font-mono">CTRL+V:</span> Yapıştır Aktif</p>
             </div>
         </main>
 
@@ -111,7 +109,7 @@
 
     <script>
         const canvas = new fabric.Canvas('mainCanvas', { width: 800, height: 550, backgroundColor: '#111' });
-        let history = [], clipboard = null, mousePos = { x: 0, y: 0 }, currentMode = 'select';
+        let history = [], mousePos = { x: 0, y: 0 }, currentMode = 'select';
         let isDrawingRect = false, rectObj = null, startX, startY;
 
         fabric.Object.prototype.set({
@@ -120,7 +118,25 @@
 
         document.addEventListener('mousemove', e => { mousePos.x = e.pageX; mousePos.y = e.pageY; });
 
-        // --- MAGIC MOD MANTIĞI v3.2 ---
+        // --- CTRL+V YAPISTIRMA ÖZELLİĞİ ---
+        window.addEventListener('paste', e => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let index in items) {
+                if (items[index].kind === 'file') {
+                    const blob = items[index].getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = (f) => fabric.Image.fromURL(f.target.result, img => {
+                        img.scaleToWidth(300);
+                        canvas.add(img).centerObject(img);
+                        canvas.setActiveObject(img);
+                        saveState();
+                    });
+                    reader.readAsDataURL(blob);
+                }
+            }
+        });
+
+        // --- MAGIC MOD ---
         function toggleMagicPanel(show) {
             const panel = document.getElementById('magic-editor-panel');
             panel.style.display = show ? 'block' : 'none';
@@ -143,11 +159,9 @@
             }
         }
 
-        // DIŞARI TIKLAYINCA KAPATMA (FIX)
         document.addEventListener('mousedown', (e) => {
             const panel = document.getElementById('magic-editor-panel');
             const magicBtn = document.getElementById('btn-magic');
-            // Eğer panel açıksa ve tıklanan yer panel veya butonu değilse kapat
             if (panel.style.display === 'block' && !panel.contains(e.target) && !magicBtn.contains(e.target)) {
                 toggleMagicPanel(false);
                 setMode('select');
@@ -186,7 +200,6 @@
             }
         });
 
-        // --- MOD YÖNETİMİ ---
         function setMode(mode) {
             currentMode = mode;
             document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active-tool'));
@@ -194,12 +207,8 @@
             document.getElementById('mode-tag').innerText = mode.toUpperCase() + " MODU";
             const btn = document.getElementById('btn-' + mode);
             if(btn) btn.classList.add('active-tool');
-            
-            if (mode === 'magic') {
-                toggleMagicPanel(true);
-            } else {
-                toggleMagicPanel(false);
-            }
+            if (mode === 'magic') toggleMagicPanel(true);
+            else toggleMagicPanel(false);
 
             if (canvas.isDrawingMode) {
                 canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
@@ -208,7 +217,6 @@
             }
         }
 
-        // --- DİĞER FONKSİYONLAR (Aynı) ---
         function addText() {
             const text = new fabric.IText('TRKM EDIT v3.2', {
                 left: 100, top: 100, fontFamily: document.getElementById('fontSelect').value,
@@ -238,7 +246,8 @@
             document.getElementById('v-bright').innerText = val.toFixed(2);
             const obj = canvas.getActiveObject();
             if(obj && obj.type === 'image') {
-                obj.filters[0] = new fabric.Image.filters.Brightness({ brightness: val });
+                if(!obj.filters[0]) obj.filters[0] = new fabric.Image.filters.Brightness({ brightness: val });
+                else obj.filters[0].brightness = val;
                 obj.applyFilters(); canvas.renderAll();
             }
         });
@@ -251,7 +260,6 @@
             obj.applyFilters(); canvas.renderAll(); saveState();
         }
 
-        // --- SİSTEM ---
         window.addEventListener('keydown', e => {
             const key = e.key.toLowerCase();
             const activeObj = canvas.getActiveObject();
@@ -281,7 +289,7 @@
 
         document.getElementById('fileInput').addEventListener('change', e => {
             const reader = new FileReader();
-            reader.onload = f => fabric.Image.fromURL(f.target.result, img => { img.scaleToWidth(400); canvas.add(img).centerObject(img); });
+            reader.onload = f => fabric.Image.fromURL(f.target.result, img => { img.scaleToWidth(400); canvas.add(img).centerObject(img); saveState(); });
             reader.readAsDataURL(e.target.files[0]);
         });
 
