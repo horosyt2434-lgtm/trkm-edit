@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRKM EDIT | PRO MAX</title>
+    <title>TRKM EDIT v3.1 | Stable</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,7 +24,7 @@
 
     <header class="h-14 bg-[#0a0a0a] border-b border-[#222] flex items-center justify-between px-6 z-50">
         <div class="flex items-center gap-4">
-            <span class="font-black text-lg tracking-tighter italic">TRKM <span class="text-blue-500">EDIT</span></span>
+            <span class="font-black text-lg tracking-tighter italic">TRKM <span class="text-blue-500">EDIT</span> <span class="text-[10px] bg-gray-800 px-2 py-0.5 rounded text-gray-400 ml-2">v3.1</span></span>
             <div class="text-[9px] bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20 font-bold uppercase" id="mode-tag">SEÇİM MODU</div>
         </div>
         <div class="flex gap-2">
@@ -35,7 +35,7 @@
 
     <div id="context-menu">
         <button onclick="copyObject()"><i class="fa-solid fa-copy"></i> Kopyala</button>
-        <button onclick="manualPaste()"><i class="fa-solid fa-paste"></i> Yapıştır (Clipboard)</button>
+        <button onclick="manualPaste()"><i class="fa-solid fa-paste"></i> Yapıştır</button>
         <div class="h-[1px] bg-[#222] my-1"></div>
         <button onclick="deleteSelected()" class="text-red-500"><i class="fa-solid fa-trash"></i> Sil</button>
     </div>
@@ -47,9 +47,8 @@
             <button id="btn-eraser" onclick="setMode('eraser')" class="tool-btn"><i class="fa-solid fa-eraser"></i></button>
             <button id="btn-text" onclick="setMode('text')" class="tool-btn"><i class="fa-solid fa-font"></i></button>
             <button id="btn-rect" onclick="setMode('rect')" class="tool-btn"><i class="fa-solid fa-square"></i></button>
-            <button id="btn-magic" onclick="setMode('magic')" class="tool-btn text-purple-500" title="Arka Plan Kaldır (Tıkla ve Seç)"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+            <button id="btn-magic" onclick="setMode('magic')" class="tool-btn text-purple-500"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
             <div class="mt-auto mb-4 flex flex-col gap-3">
-                <label class="text-[8px] text-center text-gray-500">ANA RENK</label>
                 <input type="color" id="colorPicker" value="#3b82f6" class="w-8 h-8 bg-transparent cursor-pointer rounded-lg border border-[#333]">
             </div>
         </aside>
@@ -57,17 +56,17 @@
         <main class="flex-1 bg-[#050505] relative flex items-center justify-center p-4">
             <canvas id="mainCanvas"></canvas>
             <div class="absolute bottom-4 left-4 bg-[#0a0a0a]/90 p-3 rounded-lg border border-[#222] text-[9px] text-gray-400">
-                <p><span class="text-purple-500 font-bold">MAGIC:</span> Resme tıkla, o rengi silsin!</p>
-                <p><span class="text-white font-mono">1:</span> Menü | <span class="text-white font-mono">CTRL+V:</span> Yapıştır</p>
+                <p><span class="text-white font-mono">1:</span> Menü | <span class="text-white font-mono">V:</span> Seçim | <span class="text-white font-mono">R:</span> Kare</p>
+                <p><span class="text-green-500 font-mono">CTRL+V:</span> Görsel Yapıştır</p>
             </div>
         </main>
 
         <aside class="w-72 bg-[#0a0a0a] border-l border-[#222] p-5 flex flex-col gap-6">
             <section class="border-b border-[#222] pb-4">
-                <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 text-blue-500">Yazı Kontrol</h3>
+                <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 text-blue-500">Yazı Ayarları</h3>
                 <div class="space-y-3">
-                    <div class="flex items-center justify-between gap-2">
-                        <label class="text-[10px] text-gray-400 font-bold">YAZI RENGİ</label>
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] text-gray-400 font-bold">RENK</label>
                         <input type="color" id="textColorPicker" oninput="changeTextColor(this.value)" value="#ffffff" class="w-10 h-6 bg-transparent cursor-pointer">
                     </div>
                     <select id="fontSelect" onchange="changeFontStyle()" class="w-full bg-[#111] border border-[#222] rounded p-2 text-xs">
@@ -80,19 +79,13 @@
             </section>
 
             <section>
-                <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Görsel Efektler</h3>
+                <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Görsel Kontrol</h3>
                 <div class="space-y-2">
                     <div class="flex justify-between text-[10px] font-bold text-gray-400">
                         <span>PARLAKLIK</span><span id="v-bright" class="text-blue-500">0.00</span>
                     </div>
                     <input type="range" id="brightness" min="-1" max="1" step="0.01" value="0" class="w-full">
-                    
-                    <div class="flex justify-between text-[10px] font-bold text-gray-400 mt-2">
-                        <span>MAGIC HASSASİYET</span>
-                    </div>
-                    <input type="range" id="magicTolerance" min="0.01" max="0.5" step="0.01" value="0.1" class="w-full">
-                    
-                    <button onclick="enhanceQuality()" class="hd-btn w-full py-3 mt-2 text-[10px]">HD YAP / KESKİNLEŞTİR</button>
+                    <button onclick="enhanceQuality()" class="hd-btn w-full py-3 mt-2 text-[10px]">HD KALİTEYİ ARTIR</button>
                 </div>
             </section>
 
@@ -103,7 +96,8 @@
 
     <script>
         const canvas = new fabric.Canvas('mainCanvas', { width: 800, height: 550, backgroundColor: '#111' });
-        let history = [], clipboard = null, mousePos = { x: 0, y: 0 };
+        let history = [], clipboard = null, mousePos = { x: 0, y: 0 }, currentMode = 'select';
+        let isDrawingRect = false, rectObj = null, startX, startY;
 
         fabric.Object.prototype.set({
             transparentCorners: false, cornerColor: '#3b82f6', borderColor: '#3b82f6', cornerSize: 8, padding: 0
@@ -111,107 +105,47 @@
 
         document.addEventListener('mousemove', e => { mousePos.x = e.pageX; mousePos.y = e.pageY; });
 
-        // --- ARKA PLAN KALDIRMA (SEÇEREK) ---
-        canvas.on('mouse:down', function(opt) {
-            if (currentMode === 'magic' && opt.target && opt.target.type === 'image') {
-                const pointer = canvas.getPointer(opt.e);
-                const x = Math.round(pointer.x - opt.target.left);
-                const y = Math.round(pointer.y - opt.target.top);
-                
-                // Tıklanan yerin rengini al (hassas ölçüm)
-                const ctx = canvas.getContext('2d');
-                const pixel = ctx.getImageData(opt.e.offsetX, opt.e.offsetY, 1, 1).data;
-                const hex = "#" + ("000000" + ((pixel[0] << 16) | (pixel[1] << 8) | pixel[2]).toString(16)).slice(-6);
-                
-                const tolerance = parseFloat(document.getElementById('magicTolerance').value);
-                
-                // Filtre uygula
-                opt.target.filters.push(new fabric.Image.filters.RemoveColor({
-                    color: hex,
-                    distance: tolerance
-                }));
-                
-                opt.target.applyFilters();
-                canvas.renderAll();
+        // --- RECT MODU FIX ---
+        canvas.on('mouse:down', function(o) {
+            if (currentMode !== 'rect') return;
+            isDrawingRect = true;
+            let pointer = canvas.getPointer(o.e);
+            startX = pointer.x; startY = pointer.y;
+            rectObj = new fabric.Rect({
+                left: startX, top: startY, width: 0, height: 0,
+                fill: document.getElementById('colorPicker').value,
+                stroke: '#ffffff', strokeWidth: 0
+            });
+            canvas.add(rectObj);
+        });
+
+        canvas.on('mouse:move', function(o) {
+            if (!isDrawingRect) return;
+            let pointer = canvas.getPointer(o.e);
+            if (startX > pointer.x) rectObj.set({ left: pointer.x });
+            if (startY > pointer.y) rectObj.set({ top: pointer.y });
+            rectObj.set({ width: Math.abs(startX - pointer.x), height: Math.abs(startY - pointer.y) });
+            canvas.renderAll();
+        });
+
+        canvas.on('mouse:up', function() {
+            if (isDrawingRect) {
+                isDrawingRect = false;
+                rectObj.setCoords();
                 saveState();
+                setMode('select'); // Çizim bitince otomatik seçim moduna dön
             }
         });
 
-        // --- YAZI RENK DEĞİŞTİRME ---
-        function changeTextColor(value) {
-            const activeObj = canvas.getActiveObject();
-            if (activeObj && (activeObj.type === 'i-text' || activeObj.type === 'text')) {
-                activeObj.set('fill', value);
-                canvas.renderAll();
-                saveState();
-            }
-        }
-
-        window.addEventListener('paste', e => {
-            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-            for (let index in items) {
-                if (items[index].kind === 'file') {
-                    const blob = items[index].getAsFile();
-                    const reader = new FileReader();
-                    reader.onload = (f) => fabric.Image.fromURL(f.target.result, img => {
-                        img.scaleToWidth(300);
-                        canvas.add(img).centerObject(img).setActiveObject(img);
-                        saveState();
-                    });
-                    reader.readAsDataURL(blob);
-                }
-            }
-        });
-
-        function manualPaste() {
-            if (clipboard) {
-                clipboard.clone(cloned => {
-                    canvas.discardActiveObject();
-                    cloned.set({ left: cloned.left + 20, top: cloned.top + 20, evented: true });
-                    canvas.add(cloned);
-                    canvas.setActiveObject(cloned);
-                    canvas.requestRenderAll();
-                    saveState();
-                });
-            }
-            document.getElementById('context-menu').style.display = 'none';
-        }
-
-        function copyObject() {
-            canvas.getActiveObject()?.clone(cloned => { clipboard = cloned; });
-            document.getElementById('context-menu').style.display = 'none';
-        }
-
-        window.addEventListener('keydown', e => {
-            const key = e.key.toLowerCase();
-            const activeObj = canvas.getActiveObject();
-            const menu = document.getElementById('context-menu');
-            if (activeObj && activeObj.isEditing) return;
-            if (key === '1') {
-                e.preventDefault();
-                menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-                menu.style.left = mousePos.x + 'px';
-                menu.style.top = mousePos.y + 'px';
-                return;
-            }
-            menu.style.display = 'none';
-            if (key === 'v') setMode('select');
-            if (key === 'b') setMode('brush');
-            if (key === 'e') setMode('eraser');
-            if (key === 't') setMode('text');
-            if (key === 'm') setMode('magic');
-            if (key === 'r') setMode('rect');
-            if (key === 'delete' || key === 'backspace') deleteSelected();
-            if (e.ctrlKey && key === 'z') { e.preventDefault(); undo(); }
-        });
-
+        // --- DİĞER FONKSİYONLAR ---
         function setMode(mode) {
             currentMode = mode;
             document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active-tool'));
             canvas.isDrawingMode = (mode === 'brush' || mode === 'eraser');
             document.getElementById('mode-tag').innerText = mode.toUpperCase() + " MODU";
-            document.getElementById('btn-' + (mode === 'select' ? 'select' : mode)).classList.add('active-tool');
-            if (mode === 'text') addText();
+            const btn = document.getElementById('btn-' + mode);
+            if(btn) btn.classList.add('active-tool');
+            
             if (canvas.isDrawingMode) {
                 canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
                 canvas.freeDrawingBrush.width = 10;
@@ -220,7 +154,7 @@
         }
 
         function addText() {
-            const text = new fabric.IText('YAZI BURAYA', {
+            const text = new fabric.IText('TRKM EDIT v3.1', {
                 left: 100, top: 100, fontFamily: document.getElementById('fontSelect').value,
                 fill: document.getElementById('textColorPicker').value, fontSize: 40, fontWeight: 'bold'
             });
@@ -228,12 +162,18 @@
             saveState();
         }
 
+        function changeTextColor(value) {
+            const active = canvas.getActiveObject();
+            if (active && (active.type === 'i-text' || active.type === 'text')) {
+                active.set('fill', value); canvas.renderAll(); saveState();
+            }
+        }
+
         function changeFontStyle() {
             const obj = canvas.getActiveObject();
             if (obj && obj.type === 'i-text') {
                 obj.set('fontFamily', document.getElementById('fontSelect').value);
-                canvas.renderAll();
-                saveState();
+                canvas.renderAll(); saveState();
             }
         }
 
@@ -250,22 +190,52 @@
         function enhanceQuality() {
             const obj = canvas.getActiveObject();
             if (!obj || obj.type !== 'image') return;
-            obj.filters.push(new fabric.Image.filters.Contrast({ contrast: 0.1 }));
+            obj.filters.push(new fabric.Image.filters.Contrast({ contrast: 0.15 }));
             obj.filters.push(new fabric.Image.filters.Convolute({ matrix: [ 0, -1, 0, -1, 5, -1, 0, -1, 0 ] }));
             obj.applyFilters(); canvas.renderAll(); saveState();
         }
+
+        // --- SISTEM ---
+        window.addEventListener('paste', e => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let index in items) {
+                if (items[index].kind === 'file') {
+                    const blob = items[index].getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = (f) => fabric.Image.fromURL(f.target.result, img => {
+                        img.scaleToWidth(300); canvas.add(img).centerObject(img); saveState();
+                    });
+                    reader.readAsDataURL(blob);
+                }
+            }
+        });
+
+        window.addEventListener('keydown', e => {
+            const key = e.key.toLowerCase();
+            const activeObj = canvas.getActiveObject();
+            if (activeObj && activeObj.isEditing) return;
+            if (key === '1') {
+                e.preventDefault();
+                const menu = document.getElementById('context-menu');
+                menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+                menu.style.left = mousePos.x + 'px'; menu.style.top = mousePos.y + 'px';
+            }
+            if (key === 'v') setMode('select');
+            if (key === 'r') setMode('rect');
+            if (key === 't') { setMode('text'); addText(); }
+            if (key === 'delete' || key === 'backspace') deleteSelected();
+        });
 
         function deleteSelected() {
             const active = canvas.getActiveObject();
             if (!active || active.isEditing) return;
             canvas.remove(...(active.type === 'activeSelection' ? active.getObjects() : [active]));
-            canvas.discardActiveObject().renderAll();
-            saveState();
+            canvas.discardActiveObject().renderAll(); saveState();
         }
 
         function saveState() { history.push(JSON.stringify(canvas)); if(history.length > 30) history.shift(); }
         function undo() { if(history.length > 1) { history.pop(); canvas.loadFromJSON(history[history.length-1], () => canvas.renderAll()); } }
-        function downloadImage() { const a = document.createElement('a'); a.download = 'trkm-pro.png'; a.href = canvas.toDataURL({format:'png', quality:1}); a.click(); }
+        function downloadImage() { const a = document.createElement('a'); a.download = 'trkm_v3_1.png'; a.href = canvas.toDataURL(); a.click(); }
 
         document.getElementById('fileInput').addEventListener('change', e => {
             const reader = new FileReader();
@@ -273,7 +243,6 @@
             reader.readAsDataURL(e.target.files[0]);
         });
 
-        let currentMode = 'select';
         saveState();
     </script>
 </body>
